@@ -36,7 +36,7 @@ class LogisticTrainer(BaseTrainer):
         """
         # TODO: Implement this function (task 2b)
         
-        outputs = model.forward(X_batch).T
+        outputs = model.forward(X_batch)
         model.backward(X_batch,outputs,Y_batch)
         
         loss = cross_entropy_loss(Y_batch, outputs)

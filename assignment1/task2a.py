@@ -83,14 +83,15 @@ class BinaryModel:
             targets: labels/targets of each image of shape: [batch size, 1]
         """
         # TODO implement this function (Task 2a)
+        
         assert targets.shape == outputs.shape,\
             f"Output shape: {outputs.shape}, targets: {targets.shape}"
         self.grad = np.zeros_like(self.w)
         assert self.grad.shape == self.w.shape,\
             f"Grad shape: {self.grad.shape}, w: {self.w.shape}"
-        
-        self.grad = -(targets - outputs).T.dot(X)
+        self.grad = -(targets - outputs).T.dot(X)/X.shape[0]
         self.grad = self.grad.T
+        
     def zero_grad(self) -> None:
         self.grad = None
 
