@@ -13,7 +13,7 @@ def pre_process_images(X: np.ndarray):
     assert X.shape[1] == 784,\
         f"X.shape[1]: {X.shape[1]}, should be 784"
     # TODO implement this function (Task 2a)
-    batch_size, arr = X.shape
+    batch_size = X.shape[0]
     lfunc = lambda e: -1+e*2/255
     vfunc = np.vectorize(lfunc)
     X = vfunc(X)
@@ -31,16 +31,31 @@ def cross_entropy_loss(targets: np.ndarray, outputs: np.ndarray) -> float:
         Cross entropy error (float)
     """
     # TODO implement this function (Task 2a)
+    N = targets.shape[0]
+    K = targets.shape[1] # = 1
+
+    loss = -1/(N*K) * np.sum(targets * np.log(outputs) + (1 - targets) * np.log(1 - outputs))
+
     assert targets.shape == outputs.shape,\
         f"Targets shape: {targets.shape}, outputs: {outputs.shape}"
-    return 0
+    return loss
+
+
+    assert targets.shape == outputs.shape,\
+        f"Targets shape: {targets.shape}, outputs: {outputs.shape}"
+    
+    N = targets.shape[0]
+    C_n = -(targets.T.dot(np.log(outputs)) + (1-targets).T.dot(np.log(1-outputs)))
+    loss = 1/N*np.sum(C_n)
+    
+    return loss
 
 
 class BinaryModel:
 
     def __init__(self):
         # Define number of input nodes
-        self.I = None
+        self.I = 785
         self.w = np.zeros((self.I, 1))
         self.grad = None
 
@@ -52,7 +67,9 @@ class BinaryModel:
             y: output of model with shape [batch size, 1]
         """
         # TODO implement this function (Task 2a)
-        y = 1/(1+np.exp(-self.w.T.dot(X)))
+    
+    
+        y = 1/(1+np.exp(-X.dot(self.w)))
         
         return y
         #return None
@@ -72,8 +89,8 @@ class BinaryModel:
         assert self.grad.shape == self.w.shape,\
             f"Grad shape: {self.grad.shape}, w: {self.w.shape}"
         
-        #self.grad = 
-
+        self.grad = -(targets - outputs).T.dot(X)
+        self.grad = self.grad.T
     def zero_grad(self) -> None:
         self.grad = None
 
@@ -108,10 +125,11 @@ def gradient_approximation_test(model: BinaryModel, X: np.ndarray, Y: np.ndarray
 
 
 if __name__ == "__main__":
-    print("Hello world")
     category1, category2 = 2, 3
     X_train, Y_train, *_ = utils.load_binary_dataset(category1, category2)
     X_train = pre_process_images(X_train)
+    print(X_train)
+    print(X_train.shape)
     assert X_train.max() <= 1.0, f"The images (X_train) should be normalized to the range [-1, 1]"
     assert X_train.min() < 0 and X_train.min() >= -1, f"The images (X_train) should be normalized to the range [-1, 1]"
     assert X_train.shape[1] == 785,\
@@ -120,6 +138,7 @@ if __name__ == "__main__":
     # Simple test for forward pass. Note that this does not cover all errors!
     model = BinaryModel()
     logits = model.forward(X_train)
+    print(f"Printing forward: {X_train.shape}")
     np.testing.assert_almost_equal(
         logits.mean(), .5,
         err_msg="Since the weights are all 0's, the sigmoid activation should be 0.5")
