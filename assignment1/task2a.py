@@ -13,6 +13,12 @@ def pre_process_images(X: np.ndarray):
     assert X.shape[1] == 784,\
         f"X.shape[1]: {X.shape[1]}, should be 784"
     # TODO implement this function (Task 2a)
+    batch_size, arr = X.shape
+    lfunc = lambda e: -1+e*2/255
+    vfunc = np.vectorize(lfunc)
+    X = vfunc(X)
+    bias_trick = np.ones((batch_size, 1))
+    X = np.hstack((bias_trick, X))
     return X
 
 
@@ -46,7 +52,10 @@ class BinaryModel:
             y: output of model with shape [batch size, 1]
         """
         # TODO implement this function (Task 2a)
-        return None
+        y = 1/(1+np.exp(-self.w.T.dot(X)))
+        
+        return y
+        #return None
 
     def backward(self, X: np.ndarray, outputs: np.ndarray, targets: np.ndarray) -> None:
         """
@@ -62,6 +71,8 @@ class BinaryModel:
         self.grad = np.zeros_like(self.w)
         assert self.grad.shape == self.w.shape,\
             f"Grad shape: {self.grad.shape}, w: {self.w.shape}"
+        
+        #self.grad = 
 
     def zero_grad(self) -> None:
         self.grad = None
@@ -97,6 +108,7 @@ def gradient_approximation_test(model: BinaryModel, X: np.ndarray, Y: np.ndarray
 
 
 if __name__ == "__main__":
+    print("Hello world")
     category1, category2 = 2, 3
     X_train, Y_train, *_ = utils.load_binary_dataset(category1, category2)
     X_train = pre_process_images(X_train)
