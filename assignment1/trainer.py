@@ -1,3 +1,4 @@
+from pickle import NONE
 import numpy as np
 import utils
 
@@ -73,6 +74,8 @@ class BaseTrainer:
         )
 
         global_step = 0
+        best = None
+        counting = 0
         for epoch in range(num_epochs):
             train_loader = utils.batch_loader(
                 self.X_train, self.Y_train, self.batch_size, shuffle=self.shuffle_dataset)
@@ -90,5 +93,18 @@ class BaseTrainer:
 
                     # TODO (Task 2d): Implement early stopping here.
                     # You can access the validation loss in val_history["loss"]
-                global_step += 1
+                    if best == None:
+                        best = val_loss
+                    elif val_loss < best:
+                        counting = 0
+                        best = val_loss
+                    else:
+                        counting += 1
+                if counting == 10:
+                    print("global step1: ", global_step)
+                    print("Training stopped on epoch", epoch)
+                    return train_history, val_history
+                
+
+                global_step += 1            
         return train_history, val_history
