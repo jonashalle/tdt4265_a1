@@ -35,12 +35,12 @@ class LogisticTrainer(BaseTrainer):
             loss value (float) on batch
         """
         # TODO: Implement this function (task 2b)
-        
-        outputs = model.forward(X_batch)
-        model.backward(X_batch,outputs,Y_batch)
-        
+        outputs = model.forward(X_batch)                
         loss = cross_entropy_loss(Y_batch, outputs)
+        model.backward(X_batch,outputs,Y_batch)
+        model.w = model.w-learning_rate*model.grad
 
+        print(loss)
         return loss
 
     def validation_step(self):
