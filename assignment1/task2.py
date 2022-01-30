@@ -80,7 +80,7 @@ if __name__ == "__main__":
     num_epochs = 500
     learning_rate = 0.05
     batch_size = 128
-    shuffle_dataset = False
+    shuffle_dataset = True
 
     # Load dataset
     category1, category2 = 2, 3
