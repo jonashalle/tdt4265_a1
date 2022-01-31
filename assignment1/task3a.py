@@ -14,13 +14,8 @@ def cross_entropy_loss(targets: np.ndarray, outputs: np.ndarray):
     """
     # TODO implement this function (Task 3a)
     assert targets.shape == outputs.shape,\
-        f"Targets shape: {targets.shape}, outputs: {outputs.shape}"
-    N = targets.shape[1]
-    #C_n = - np.sum(targets.T.dot(np.log(outputs)))
-    C_n = targets.T.dot(np.log(outputs))
-    print("cn shape: " ,C_n.shape)
-    loss = np.sum(C_n)/N
-    print(loss)
+        f"Targets shape: {targets.shape}, outputs: {outputs.shape}"   
+    loss = -np.sum(targets * np.log(outputs)) / targets.shape[0]
     return loss
 
 
@@ -68,8 +63,7 @@ class SoftmaxModel:
         self.grad = np.zeros_like(self.w)
         assert self.grad.shape == self.w.shape,\
              f"Grad shape: {self.grad.shape}, w: {self.w.shape}"
-        self.grad = -(targets - outputs).T.dot(X)/X.shape[0]
-        self.grad = self.grad.T
+        self.grad = -X.T.dot(targets-outputs)/X.shape[0]
 
     def zero_grad(self) -> None:
         self.grad = None
