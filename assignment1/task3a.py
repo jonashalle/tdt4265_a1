@@ -72,7 +72,11 @@ def one_hot_encode(Y: np.ndarray, num_classes: int):
         Y: shape [Num examples, num classes]
     """
     # TODO implement this function (Task 3a)
-    raise NotImplementedError
+    Y = np.eye(num_classes)[Y]
+    Y = np.squeeze(Y, axis=1)
+    return Y
+
+    # raise NotImplementedError
 
 
 def gradient_approximation_test(model: SoftmaxModel, X: np.ndarray, Y: np.ndarray):
