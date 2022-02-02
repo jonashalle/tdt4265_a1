@@ -25,7 +25,7 @@ def calculate_accuracy(X: np.ndarray, targets: np.ndarray, model: SoftmaxModel) 
     #print("shape target: ",targets.shape,"   shape out: ", outputs.shape)
     for idx, val in enumerate(outputs):
         target = targets[idx]
-        if val >= 0.5 and target == 1 or val <= 0.5 and target == 0:
+        if val >= 0.5 and target == 1 or val<0.5 and target == 0:
             correct_predictions += 1
     accuracy = correct_predictions/predictions
     
