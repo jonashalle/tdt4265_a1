@@ -23,11 +23,6 @@ def calculate_accuracy(X: np.ndarray, targets: np.ndarray, model: SoftmaxModel) 
     outputs = model.forward(X)
     #print("shape target: ",targets.shape,"   shape out: ", outputs.shape)
     outputs = model.forward(X)
-    pred = np.argmax(targets, axis=1)
-    targ = np.argmax(outputs, axis=1)
-    accuracy = np.sum(pred == targ) / len(pred)
-    return accuracy
-
     for idx, val in enumerate(outputs):
         target = targets[idx]
         if np.argmax(target)==np.argmax(val):
@@ -125,7 +120,7 @@ if __name__ == "__main__":
     plt.show()
 
     # Plot accuracy
-    plt.ylim([0.89, .93])
+    plt.ylim([0.8, .96])
     utils.plot_loss(train_history["accuracy"], "Training Accuracy")
     utils.plot_loss(val_history["accuracy"], "Validation Accuracy")
     plt.xlabel("Number of Training Steps")
