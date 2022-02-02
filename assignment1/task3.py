@@ -21,11 +21,16 @@ def calculate_accuracy(X: np.ndarray, targets: np.ndarray, model: SoftmaxModel) 
     correct_predictions = 0
     predictions = targets.shape[0]
     outputs = model.forward(X)
-    
     #print("shape target: ",targets.shape,"   shape out: ", outputs.shape)
+    outputs = model.forward(X)
+    pred = np.argmax(targets, axis=1)
+    targ = np.argmax(outputs, axis=1)
+    accuracy = np.sum(pred == targ) / len(pred)
+    return accuracy
+
     for idx, val in enumerate(outputs):
         target = targets[idx]
-        if val >= 0.5 and target == 1 or val<0.5 and target == 0:
+        if np.argmax(target)==np.argmax(val):
             correct_predictions += 1
     accuracy = correct_predictions/predictions
     
