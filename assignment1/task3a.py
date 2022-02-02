@@ -15,12 +15,11 @@ def cross_entropy_loss(targets: np.ndarray, outputs: np.ndarray):
     # TODO implement this function (Task 3a)
     assert targets.shape == outputs.shape,\
         f"Targets shape: {targets.shape}, outputs: {outputs.shape}"
-    N = targets.shape[1]
-    #C_n = - np.sum(targets.T.dot(np.log(outputs)))
-    C_n = targets.T.dot(np.log(outputs))
-    print("cn shape: " ,C_n.shape)
+    N = targets.shape[0]
+    #print(f"Target shape: {targets.shape}, Output shape: {outputs.shape}")
+    C_n = -targets*(np.log(outputs))
     loss = np.sum(C_n)/N
-    print(loss)
+    #print(loss)
     return loss
 
 

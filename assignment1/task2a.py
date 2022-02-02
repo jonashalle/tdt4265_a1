@@ -122,8 +122,8 @@ if __name__ == "__main__":
     category1, category2 = 2, 3
     X_train, Y_train, *_ = utils.load_binary_dataset(category1, category2)
     X_train = pre_process_images(X_train)
-    print(X_train)
-    print(X_train.shape)
+    #print(X_train)
+    #print(X_train.shape)
     assert X_train.max() <= 1.0, f"The images (X_train) should be normalized to the range [-1, 1]"
     assert X_train.min() < 0 and X_train.min() >= -1, f"The images (X_train) should be normalized to the range [-1, 1]"
     assert X_train.shape[1] == 785,\
@@ -132,7 +132,7 @@ if __name__ == "__main__":
     # Simple test for forward pass. Note that this does not cover all errors!
     model = BinaryModel()
     logits = model.forward(X_train)
-    print(f"Printing forward: {X_train.shape}")
+    #print(f"Printing forward: {X_train.shape}")
     np.testing.assert_almost_equal(
         logits.mean(), .5,
         err_msg="Since the weights are all 0's, the sigmoid activation should be 0.5")
