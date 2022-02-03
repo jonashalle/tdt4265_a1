@@ -63,8 +63,8 @@ def load_binary_dataset(class1: int, class2: int):
     """
     Loads, prunes and splits the dataset into train, and validation.
     """
-    train_size = 18000
-    val_size = 2000
+    train_size = 1800
+    val_size = 200
     X_train, Y_train, X_val, Y_val = mnist.load()
 
     # First 20000 images from train set
