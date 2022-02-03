@@ -67,10 +67,13 @@ class SoftmaxModel:
         self.grad = np.zeros_like(self.w)
         assert self.grad.shape == self.w.shape,\
              f"Grad shape: {self.grad.shape}, w: {self.w.shape}"
-        #self.grad = -X.T.dot(targets-outputs)/X.shape[0]
+
+        # self.grad = -X.T.dot(targets-outputs)/X.shape[0]
 
         # To implement L2 regularization task (4b) you can get the lambda value in self.l2_reg_lambda
-        self.grad = (-X.T.dot(targets - outputs) + self.l2_reg_lambda*np.sum(self.w))/X.shape[0]
+        self.grad = (-X.T.dot(targets - outputs) + self.l2_reg_lambda*self.w)/X.shape[0]
+        #penalty = self.l2_reg_lambda*self.w
+        #self.grad = np.divide(np.dot(X.T, -np.subtract(targets, outputs)) + penalty, np.size(targets, 0))
 
     def zero_grad(self) -> None:
         self.grad = None
@@ -138,7 +141,7 @@ if __name__ == "__main__":
         f"Expected X_train to have 785 elements per image. Shape was: {X_train.shape}"
 
     # Simple test for forward pass. Note that this does not cover all errors!
-    model = SoftmaxModel(0.0)
+    model = SoftmaxModel(2)
     logits = model.forward(X_train)
     np.testing.assert_almost_equal(
         logits.mean(), 1/10,
