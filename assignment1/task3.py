@@ -47,10 +47,10 @@ class SoftmaxTrainer(BaseTrainer):
             loss value (float) on batch
         """
         # TODO: Implement this function (task 3b)
-        outputs = model.forward(X_batch)                
+        outputs = self.model.forward(X_batch)                
         loss = cross_entropy_loss(Y_batch, outputs)
-        model.backward(X_batch,outputs,Y_batch)
-        model.w = model.w-learning_rate*model.grad
+        self.model.backward(X_batch,outputs,Y_batch)
+        self.model.w = self.model.w-learning_rate*self.model.grad
         return loss
 
     def validation_step(self):
@@ -132,7 +132,7 @@ if __name__ == "__main__":
     '''
     # Train a model with L2 regularization (task 4b)
 
-    model1 = SoftmaxModel(l2_reg_lambda=0.0)
+    model1 = SoftmaxModel(0.0)
     trainer1 = SoftmaxTrainer(
         model1, learning_rate, batch_size, shuffle_dataset,
         X_train, Y_train, X_val, Y_val,
@@ -148,9 +148,9 @@ if __name__ == "__main__":
     for i in range(model.w.shape[2]-1):
         temp_arr = np.hstack((temp_arr, model.w[:,:,i+1]))
     model.w = temp_arr
-    plt.imsave("task4b_softmax_weight_model.png", model.w, cmap="gray")
+    #plt.imsave("task4b_softmax_weight_model_lambda_done.png", model.w, cmap="gray")
 
-    
+    '''
     model1.w = np.delete(model1.w, 0, axis=0)
     model1.w = model1.w.reshape(28, 28, 10)
     temp_arr = model1.w[:,:,0]
@@ -161,9 +161,18 @@ if __name__ == "__main__":
     
     model_arr = np.vstack((model.w, model1.w))
     plt.imsave("task4b_softmax_weight_combine.png", model_arr, cmap="gray")
-
+    '''
     # Plotting of accuracy for difference values of lambdas (task 4c)
     l2_lambdas = [2, .2, .02, .002]
+        
+    models = np.zeros((l2_lambdas.shape[0]))
+    trainers = np.zeros((l2_lambdas.shape[0]))
+    for _lambda in l2_lambdas:
+        models[0] = SoftmaxModel(_lambda)
+
+
+
+
     plt.savefig("task4c_l2_reg_accuracy.png")
 
     # Task 4d - Plotting of the l2 norm for each weight
