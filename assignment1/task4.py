@@ -111,14 +111,13 @@ if __name__ == "__main__":
         train_hist, val_hist = trainer.train(num_epochs)
         train_hists.append(train_hist)
         val_hists.append(val_hist)
-        print("shape trainhist", train_hists[idx])
 
     train_history = train_hists[0]
     val_history = val_hists[0]
-    plt.ylim([0.2, .6])
-    utils.plot_loss(train_history["loss"],
-                    "Training Loss", npoints_to_average=10)
-    utils.plot_loss(val_history["loss"], "Validation Loss")
+    
+    plt.ylim([0.2, 1])
+    for i in range(len(val_hists)):
+        utils.plot_loss(val_hists[i]["loss"], f"Validation Loss:{i}")
     plt.legend()
     plt.xlabel("Number of Training Steps")
     plt.ylabel("Cross Entropy Loss - Average")
@@ -126,7 +125,7 @@ if __name__ == "__main__":
     plt.show()
 
     # Plot accuracy
-    plt.ylim([0.8, .96])
+    plt.ylim([0.5, 1])
     utils.plot_loss(train_history["accuracy"], "Training Accuracy")
     utils.plot_loss(val_history["accuracy"], "Validation Accuracy")
     plt.xlabel("Number of Training Steps")
