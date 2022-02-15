@@ -14,6 +14,11 @@ def pre_process_images(X: np.ndarray):
     assert X.shape[1] == 784,\
         f"X.shape[1]: {X.shape[1]}, should be 784"
     # TODO implement this function (Task 2a)
+    bias = np.ones((X.shape[0],1))
+    mean = np.mean(X)
+    standard_variation = np.std(X)
+    X = (X - mean) / standard_variation
+    X = np.append(X, bias, axis = 1)
     return X
 
 
@@ -28,7 +33,16 @@ def cross_entropy_loss(targets: np.ndarray, outputs: np.ndarray):
     assert targets.shape == outputs.shape,\
         f"Targets shape: {targets.shape}, outputs: {outputs.shape}"
     # TODO: Implement this function (copy from last assignment)
-    raise NotImplementedError
+    N = targets.shape[0]
+    C_n = -targets*(np.log(outputs))
+    loss = np.sum(C_n)/N
+    return loss
+
+def sigmoid(z):
+    return 1/(1+np.exp(-z))
+
+def softmax(z):
+    return np.exp(z)/np.sum(np.exp(z), axis = 1, keepdims=True)
 
 
 class SoftmaxModel:
@@ -42,7 +56,7 @@ class SoftmaxModel:
         # Always reset random seed before weight init to get comparable results.
         np.random.seed(1)
         # Define number of input nodes
-        self.I = None
+        self.I = 785
         self.use_improved_sigmoid = use_improved_sigmoid
 
         # Define number of output nodes
@@ -69,9 +83,17 @@ class SoftmaxModel:
             y: output of model with shape [batch size, num_outputs]
         """
         # TODO implement this function (Task 2b)
+        z1 = np.dot(X,self.ws[0])
+        a1 = sigmoid(z1)
+        z2 = np.dot(a1,self.ws[1])
+        a2 = softmax(z2)
+
+        
         # HINT: For performing the backward pass, you can save intermediate activations in variables in the forward pass.
         # such as self.hidden_layer_output = ...
-        return None
+        return a2
+    
+    
 
     def backward(self, X: np.ndarray, outputs: np.ndarray,
                  targets: np.ndarray) -> None:
@@ -107,7 +129,9 @@ def one_hot_encode(Y: np.ndarray, num_classes: int):
         Y: shape [Num examples, num classes]
     """
     # TODO: Implement this function (copy from last assignment)
-    raise NotImplementedError
+    Y = np.eye(num_classes)[Y]
+    Y = np.squeeze(Y, axis=1)
+    return Y
 
 
 def gradient_approximation_test(
