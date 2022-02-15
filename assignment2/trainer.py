@@ -71,7 +71,9 @@ class BaseTrainer:
             loss={},
             accuracy={}
         )
-
+        no_improvement_count = 0
+        no_improvement_limit = 50
+        best = None
         global_step = 0
         for epoch in range(num_epochs):
             train_loader = utils.batch_loader(
@@ -88,5 +90,16 @@ class BaseTrainer:
                     val_history["loss"][global_step] = val_loss
                     val_history["accuracy"][global_step] = accuracy_val
                     # TODO: Implement early stopping (copy from last assignment)
+                    if best == None:
+                        best = val_loss
+                    elif val_loss < best:
+                        no_improvement_count = 0
+                        best = val_loss
+                    else:
+                        no_improvement_count += 1
+                if no_improvement_count == no_improvement_limit:
+                    print("global step1: ", global_step)
+                    print("Training stopped on epoch", epoch)
+                    return train_history, val_history
                 global_step += 1
         return train_history, val_history
