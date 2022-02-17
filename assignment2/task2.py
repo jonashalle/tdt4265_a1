@@ -43,9 +43,9 @@ class SoftmaxTrainer(BaseTrainer):
         self.momentum_gamma = momentum_gamma
         self.use_momentum = use_momentum
         
-        self.delta_w = []
-        for w in self.model.ws:
-            self.delta_w.append(np.zeros(w.shape))
+        #self.delta_w = []
+        #for w in self.model.ws:
+        #    self.delta_w.append(np.zeros(w.shape))
 
         # Init a history of previous gradients to use for implementing momentum
         self.previous_grads = [np.zeros_like(w) for w in self.model.ws]
@@ -66,8 +66,6 @@ class SoftmaxTrainer(BaseTrainer):
 
         loss = 0
 
-        # loss = cross_entropy_loss(Y_batch, logits)  # sol
-
         outputs = self.model.forward(X_batch)                
         loss = cross_entropy_loss(Y_batch, outputs)
         self.model.backward(X_batch,outputs,Y_batch)
@@ -75,18 +73,16 @@ class SoftmaxTrainer(BaseTrainer):
         # self.model.ws[1] = self.model.ws[1] - self.learning_rate * self.model.grads[1]
         # print(f"Output ws[0] : {self.model.ws[0]}")
         if self.use_momentum:
-            for dw in self.delta_w:
-                dw = self.grad[i] + self.momentum_gamma * dw
+        #    for idx, dw in enumerate(self.delta_w):
+        #        dw = self.model.grads[idx] + self.momentum_gamma * dw
+        #        self.model.ws[idx] = self.model.ws[idx] - self.learning_rate * dw   
+            for i in range(len(self.model.ws)):
+                dw = self.model.grads[i] + self.momentum_gamma * self.previous_grads[i]
+                self.model.ws[i] = self.model.ws[i] - self.learning_rate * dw
+                self.previous_grads[i] = dw
         else:
             for i in range(len(self.model.ws)):
                 self.model.ws[i] = self.model.ws[i] - self.learning_rate * self.model.grads[i]
-        
-        
-        
-        #for w, grad in self.model.ws, self.model.grads:
-        #    print(f"Shape of w : {w.shape}")
-        #    print(f"Shape of grad : {grad.shape}")
-        #    w = w - self.learning_rate * grad
 
         return loss
 
