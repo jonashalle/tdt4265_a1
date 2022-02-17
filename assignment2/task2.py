@@ -16,7 +16,18 @@ def calculate_accuracy(X: np.ndarray, targets: np.ndarray, model: SoftmaxModel) 
         Accuracy (float)
     """
     # TODO: Implement this function (copy from last assignment)
-    accuracy = 0
+    accuracy = 0.0
+    correct_predictions = 0
+    predictions = targets.shape[0]
+    outputs = model.forward(X)
+    #print("shape target: ",targets.shape,"   shape out: ", outputs.shape)
+    outputs = model.forward(X)
+    for idx, val in enumerate(outputs):
+        target = targets[idx]
+        if np.argmax(target)==np.argmax(val):
+            correct_predictions += 1
+    accuracy = correct_predictions/predictions
+
     return accuracy
 
 
@@ -50,7 +61,20 @@ class SoftmaxTrainer(BaseTrainer):
 
         loss = 0
 
-        loss = cross_entropy_loss(Y_batch, logits)  # sol
+        # loss = cross_entropy_loss(Y_batch, logits)  # sol
+
+        outputs = self.model.forward(X_batch)                
+        loss = cross_entropy_loss(Y_batch, outputs)
+        self.model.backward(X_batch,outputs,Y_batch)
+        self.model.ws[0] = self.model.ws[0] - self.learning_rate * self.model.grads[0]
+        self.model.ws[1] = self.model.ws[1] - self.learning_rate * self.model.grads[1]
+        # print(f"Output ws[0] : {self.model.ws[0]}")
+        # for i in range(len(self.model.ws)):
+            # self.model.ws[i] = self.model.ws[i] - self.learning_rate * self.model.grads[i]
+        #for w, grad in self.model.ws, self.model.grads:
+        #    print(f"Shape of w : {w.shape}")
+        #    print(f"Shape of grad : {grad.shape}")
+        #    w = w - self.learning_rate * grad
 
         return loss
 
@@ -136,3 +160,4 @@ if __name__ == "__main__":
     plt.ylabel("Accuracy")
     plt.legend()
     plt.savefig("task2c_train_loss.png")
+    plt.show()
