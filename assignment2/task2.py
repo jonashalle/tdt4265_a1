@@ -50,7 +50,20 @@ class SoftmaxTrainer(BaseTrainer):
 
         loss = 0
 
-        loss = cross_entropy_loss(Y_batch, logits)  # sol
+        # loss = cross_entropy_loss(Y_batch, logits)  # sol
+
+        outputs = self.model.forward(X_batch)                
+        loss = cross_entropy_loss(Y_batch, outputs)
+        self.model.backward(X_batch,outputs,Y_batch)
+        self.model.ws[0] = self.model.ws[0] - self.learning_rate * self.model.grads[0]
+        self.model.ws[1] = self.model.ws[1] - self.learning_rate * self.model.grads[1]
+        print(f"Output ws[0] : {self.model.ws[0]}")
+        # for i in range(len(self.model.ws)):
+            # self.model.ws[i] = self.model.ws[i] - self.learning_rate * self.model.grads[i]
+        #for w, grad in self.model.ws, self.model.grads:
+        #    print(f"Shape of w : {w.shape}")
+        #    print(f"Shape of grad : {grad.shape}")
+        #    w = w - self.learning_rate * grad
 
         return loss
 
@@ -120,7 +133,7 @@ if __name__ == "__main__":
     # Plot loss for first model (task 2c)
     plt.figure(figsize=(20, 12))
     plt.subplot(1, 2, 1)
-    plt.ylim([0., .5])
+    #plt.ylim([0., .5])
     utils.plot_loss(train_history["loss"],
                     "Training Loss", npoints_to_average=10)
     utils.plot_loss(val_history["loss"], "Validation Loss")
@@ -129,10 +142,11 @@ if __name__ == "__main__":
     plt.ylabel("Cross Entropy Loss - Average")
     # Plot accuracy
     plt.subplot(1, 2, 2)
-    plt.ylim([0.90, .99])
+    #plt.ylim([0.90, .99])
     utils.plot_loss(train_history["accuracy"], "Training Accuracy")
     utils.plot_loss(val_history["accuracy"], "Validation Accuracy")
     plt.xlabel("Number of Training Steps")
     plt.ylabel("Accuracy")
     plt.legend()
     plt.savefig("task2c_train_loss.png")
+    plt.show()

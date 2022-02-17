@@ -127,14 +127,14 @@ class SoftmaxModel:
         self.grads = []
         delta = []
 
-        d_output = diff_cross_entropy(targets, outputs)  # delta_2 = grad C/a * f'(z2)
+        delta_output = diff_cross_entropy(targets, outputs)  # delta_2 = grad C/a * f'(z2)
         # print(f"Shape of ws[1] : {self.ws[1].shape}")
         # print(f"Shape of d_output : {d_output.shape}")
         # print(f"Shape of ws[1].dot(d_output.T) : {self.ws[1].dot(d_output.T).shape}")
         # print(f"Shape of diff_sigmoid(z2) : {diff_sigmoid(self.layer_sums[1]).shape}")
-        delta.append(self.ws[1].dot(d_output.T) * diff_sigmoid(self.layer_sums[0]).T)  # delta_1 = weight_2^T delta_2 * f'(z1) 
+        delta.append(self.ws[1].dot(delta_output.T) * diff_sigmoid(self.layer_sums[0]).T)  # delta_1 = weight_2^T delta_2 * f'(z1) 
         # delta[0] =  diff_cross_entropy(targets, outputs).T.dot(delta[1]) * np.dot(self.ws[1].T, delta[1]) #     
-        delta.append(d_output)
+        delta.append(delta_output)
         # print(f"Shape of delta[1] : {delta[1].shape}")
         # print(f"Shape of weights[0] : {self.ws[0].shape}")
         # print(f"Shape of X : {X.shape}")
