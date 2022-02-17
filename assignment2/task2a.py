@@ -41,9 +41,14 @@ def cross_entropy_loss(targets: np.ndarray, outputs: np.ndarray):
 def sigmoid(z):
     return 1/(1+np.exp(-z))
 
+def diff_sigmoid(z):
+    return sigmoid(z)*(1-sigmoid(z)) # Derivative of the sigmoid function
+
 def softmax(z):
     return np.exp(z)/np.sum(np.exp(z), axis = 1, keepdims=True)
 
+def diff_cross_entropy(targets, outputs):
+    return -(targets - outputs)
 
 class SoftmaxModel:
 
@@ -83,12 +88,20 @@ class SoftmaxModel:
             y: output of model with shape [batch size, num_outputs]
         """
         # TODO implement this function (Task 2b)
+        self.layer_outputs = []
+        self.layer_sums = []
+        
         z1 = np.dot(X,self.ws[0])
         a1 = sigmoid(z1)
         z2 = np.dot(a1,self.ws[1])
         a2 = softmax(z2)
 
-        
+        self.layer_outputs.append(a1)
+        self.layer_outputs.append(a2)
+
+        self.layer_sums.append(z1)
+        self.layer_sums.append(z2)
+
         # HINT: For performing the backward pass, you can save intermediate activations in variables in the forward pass.
         # such as self.hidden_layer_output = ...
         return a2
@@ -110,7 +123,25 @@ class SoftmaxModel:
             f"Output shape: {outputs.shape}, targets: {targets.shape}"
         # A list of gradients.
         # For example, self.grads[0] will be the gradient for the first hidden layer
+        
         self.grads = []
+        delta = []
+
+        d_output = diff_cross_entropy(targets, outputs)  # delta_2 = grad C/a * f'(z2)
+        # print(f"Shape of ws[1] : {self.ws[1].shape}")
+        # print(f"Shape of d_output : {d_output.shape}")
+        # print(f"Shape of ws[1].dot(d_output.T) : {self.ws[1].dot(d_output.T).shape}")
+        # print(f"Shape of diff_sigmoid(z2) : {diff_sigmoid(self.layer_sums[1]).shape}")
+        delta.append(self.ws[1].dot(d_output.T) * diff_sigmoid(self.layer_sums[0]).T)  # delta_1 = weight_2^T delta_2 * f'(z1) 
+        # delta[0] =  diff_cross_entropy(targets, outputs).T.dot(delta[1]) * np.dot(self.ws[1].T, delta[1]) #     
+        delta.append(d_output)
+        # print(f"Shape of delta[1] : {delta[1].shape}")
+        # print(f"Shape of weights[0] : {self.ws[0].shape}")
+        # print(f"Shape of X : {X.shape}")
+        self.grads.append(delta[0].dot(X).T/X.shape[0]) # Grad C with regards to w_ji
+        self.grads.append(delta[1].T.dot(self.layer_outputs[0]).T/X.shape[0])   # Grad C with regards to w_kj
+        # print(f"Shape of diff_cross_entropy : {diff_cross_entropy(targets, outputs).shape}")
+        # print(f"Shape of grads[1] : {self.grads[1].shape}")
 
         for grad, w in zip(self.grads, self.ws):
             assert grad.shape == w.shape,\
