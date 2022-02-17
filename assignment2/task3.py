@@ -35,8 +35,8 @@ if __name__ == "__main__":
     )
     train_history1, val_history1 = trainer1.train(num_epochs)
 
-    use_improved_sigmoid = True
-    use_improved_weight_init = False
+    use_improved_sigmoid = False
+    use_improved_weight_init = True
     use_momentum = False
 
     model2 = SoftmaxModel(
@@ -86,32 +86,42 @@ if __name__ == "__main__":
     
     plt.figure(figsize=(20,12))
     plt.subplot(2, 2, 1)
-    plt.ylim([0, .4])
+    plt.ylim([0, .5])
     utils.plot_loss(train_history1["loss"],
-                    "Task 2", npoints_to_average=10)
+                    "Training Loss 2c", npoints_to_average=10)
+    utils.plot_loss(val_history1["loss"], "Validation Loss")
     plt.legend()
+    plt.xlabel("Number of Training Steps")
+    plt.ylabel("Cross Entropy Loss - Average")
     
 
     plt.subplot(2, 2, 2)
-    plt.ylim([0, .4])
-    utils.plot_loss(train_history1["loss"],
-                    "Task 3a ", npoints_to_average=10)
-    
+    plt.ylim([0, .5])
+    utils.plot_loss(train_history2["loss"],
+                    "Training Loss 3a", npoints_to_average=10)
+    utils.plot_loss(val_history2["loss"], "Validation Loss")
     plt.legend()
+    plt.xlabel("Number of Training Steps")
+    plt.ylabel("Cross Entropy Loss - Average")
 
     plt.subplot(2, 2, 3)
-    plt.ylim([0, .4])
+    plt.ylim([0, .5])
     utils.plot_loss(train_history3["loss"],
-                    "Task 3b", npoints_to_average=10)
+                    "Training Loss 3b", npoints_to_average=10)
+    utils.plot_loss(val_history3["loss"], "Validation Loss")
+    plt.legend()
+    plt.xlabel("Number of Training Steps")
+    plt.ylabel("Cross Entropy Loss - Average")
     
     
 
     plt.subplot(2, 2, 4)
-    plt.ylim([0, .4])
+    plt.ylim([0, .5])
     utils.plot_loss(train_history4["loss"],
-                    "Task 3c", npoints_to_average=10)
-
-    plt.ylabel("Validation loss")
+                    "Training Loss 3c", npoints_to_average=10)
+    utils.plot_loss(val_history4["loss"], "Validation Loss")
     plt.legend()
+    plt.xlabel("Number of Training Steps")
+    plt.ylabel("Cross Entropy Loss - Average")
 
     plt.show()
