@@ -16,7 +16,18 @@ def calculate_accuracy(X: np.ndarray, targets: np.ndarray, model: SoftmaxModel) 
         Accuracy (float)
     """
     # TODO: Implement this function (copy from last assignment)
-    accuracy = 0
+    accuracy = 0.0
+    correct_predictions = 0
+    predictions = targets.shape[0]
+    outputs = model.forward(X)
+    #print("shape target: ",targets.shape,"   shape out: ", outputs.shape)
+    outputs = model.forward(X)
+    for idx, val in enumerate(outputs):
+        target = targets[idx]
+        if np.argmax(target)==np.argmax(val):
+            correct_predictions += 1
+    accuracy = correct_predictions/predictions
+
     return accuracy
 
 
@@ -57,7 +68,7 @@ class SoftmaxTrainer(BaseTrainer):
         self.model.backward(X_batch,outputs,Y_batch)
         self.model.ws[0] = self.model.ws[0] - self.learning_rate * self.model.grads[0]
         self.model.ws[1] = self.model.ws[1] - self.learning_rate * self.model.grads[1]
-        print(f"Output ws[0] : {self.model.ws[0]}")
+        # print(f"Output ws[0] : {self.model.ws[0]}")
         # for i in range(len(self.model.ws)):
             # self.model.ws[i] = self.model.ws[i] - self.learning_rate * self.model.grads[i]
         #for w, grad in self.model.ws, self.model.grads:
@@ -133,7 +144,7 @@ if __name__ == "__main__":
     # Plot loss for first model (task 2c)
     plt.figure(figsize=(20, 12))
     plt.subplot(1, 2, 1)
-    #plt.ylim([0., .5])
+    plt.ylim([0., .5])
     utils.plot_loss(train_history["loss"],
                     "Training Loss", npoints_to_average=10)
     utils.plot_loss(val_history["loss"], "Validation Loss")
@@ -142,7 +153,7 @@ if __name__ == "__main__":
     plt.ylabel("Cross Entropy Loss - Average")
     # Plot accuracy
     plt.subplot(1, 2, 2)
-    #plt.ylim([0.90, .99])
+    plt.ylim([0.90, .99])
     utils.plot_loss(train_history["accuracy"], "Training Accuracy")
     utils.plot_loss(val_history["accuracy"], "Validation Accuracy")
     plt.xlabel("Number of Training Steps")
