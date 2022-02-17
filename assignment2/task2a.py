@@ -38,6 +38,9 @@ def cross_entropy_loss(targets: np.ndarray, outputs: np.ndarray):
     loss = np.sum(C_n)/N
     return loss
 
+def improved_sigmoid(z):
+    return 1.7159*np.tanh(2/3*z)
+
 def sigmoid(z):
     return 1/(1+np.exp(-z))
 
@@ -63,7 +66,7 @@ class SoftmaxModel:
         # Define number of input nodes
         self.I = 785
         self.use_improved_sigmoid = use_improved_sigmoid
-
+        
         # Define number of output nodes
         # neurons_per_layer = [64, 10] indicates that we will have two layers:
         # A hidden layer with 64 neurons and a output layer with 10 neurons.
@@ -75,11 +78,25 @@ class SoftmaxModel:
         for size in self.neurons_per_layer:
             w_shape = (prev, size)
             print("Initializing weight to shape:", w_shape)
-            #w = np.zeros(w_shape)
-            w = np.random.uniform(1, -1, w_shape)
+            if use_improved_weight_init:
+                fan_in = w_shape[0]
+                w = np.random.normal(0, 1/np.sqrt(fan_in), w_shape)
+            else:
+                w = np.random.uniform(1, -1, w_shape)            
             self.ws.append(w)
             prev = size
         self.grads = [None for i in range(len(self.ws))]
+
+        #init weights 4c
+        # if use_improved_weight_init:
+        #     self.ws[0] = np.random.normal(0, 1/np.sqrt(self.I), self.ws[0].shape)
+        #     for i in range(len(self.neurons_per_layer) - 1):
+        #         self.ws[i+1] = np.random.normal(0, 1/np.sqrt(self.neurons_per_layer[i]), self.ws[i+1].shape)
+        # else:
+        #     self.ws[0] = np.random.uniform(-1, 1, (self.I, self.neurons_per_layer[0]))
+        #     for i in range(len(self.neurons_per_layer) - 1):
+        #         self.ws[i+1] = np.random.uniform(-1, 1, (self.neurons_per_layer[i], self.neurons_per_layer[i+1]))
+
 
     def forward(self, X: np.ndarray) -> np.ndarray:
         """
@@ -92,10 +109,17 @@ class SoftmaxModel:
         self.layer_outputs = []
         self.layer_sums = []
         
-        z1 = np.dot(X,self.ws[0])
-        a1 = sigmoid(z1)
-        z2 = np.dot(a1,self.ws[1])
-        a2 = softmax(z2)
+        if self.use_improved_sigmoid:
+            z1 = np.dot(X,self.ws[0])
+            a1 = improved_sigmoid(z1)
+            z2 = np.dot(a1,self.ws[1])
+            a2 = softmax(z2)
+        else:
+            z1 = np.dot(X,self.ws[0])
+            a1 = sigmoid(z1)
+            z2 = np.dot(a1,self.ws[1])
+            a2 = softmax(z2)
+        
 
         self.layer_outputs.append(a1)
         self.layer_outputs.append(a2)

@@ -42,6 +42,11 @@ class SoftmaxTrainer(BaseTrainer):
 
         self.momentum_gamma = momentum_gamma
         self.use_momentum = use_momentum
+        
+        self.delta_w = []
+        for w in self.model.ws:
+            self.delta_w.append(np.zeros(w.shape))
+
         # Init a history of previous gradients to use for implementing momentum
         self.previous_grads = [np.zeros_like(w) for w in self.model.ws]
 
@@ -66,11 +71,18 @@ class SoftmaxTrainer(BaseTrainer):
         outputs = self.model.forward(X_batch)                
         loss = cross_entropy_loss(Y_batch, outputs)
         self.model.backward(X_batch,outputs,Y_batch)
-        self.model.ws[0] = self.model.ws[0] - self.learning_rate * self.model.grads[0]
-        self.model.ws[1] = self.model.ws[1] - self.learning_rate * self.model.grads[1]
+        # self.model.ws[0] = self.model.ws[0] - self.learning_rate * self.model.grads[0]
+        # self.model.ws[1] = self.model.ws[1] - self.learning_rate * self.model.grads[1]
         # print(f"Output ws[0] : {self.model.ws[0]}")
-        # for i in range(len(self.model.ws)):
-            # self.model.ws[i] = self.model.ws[i] - self.learning_rate * self.model.grads[i]
+        if self.use_momentum:
+            for dw in self.delta_w:
+                dw = self.grad[i] + self.momentum_gamma * dw
+        else:
+            for i in range(len(self.model.ws)):
+                self.model.ws[i] = self.model.ws[i] - self.learning_rate * self.model.grads[i]
+        
+        
+        
         #for w, grad in self.model.ws, self.model.grads:
         #    print(f"Shape of w : {w.shape}")
         #    print(f"Shape of grad : {grad.shape}")
@@ -111,9 +123,9 @@ if __name__ == "__main__":
     shuffle_data = True
 
     # Settings for task 3. Keep all to false for task 2.
-    use_improved_sigmoid = False
-    use_improved_weight_init = False
-    use_momentum = False
+    use_improved_sigmoid = True
+    use_improved_weight_init = True
+    use_momentum = True
 
     # Load dataset
     X_train, Y_train, X_val, Y_val = utils.load_full_mnist()
@@ -153,7 +165,7 @@ if __name__ == "__main__":
     plt.ylabel("Cross Entropy Loss - Average")
     # Plot accuracy
     plt.subplot(1, 2, 2)
-    plt.ylim([0.90, .99])
+    plt.ylim([0.9, 1.05])
     utils.plot_loss(train_history["accuracy"], "Training Accuracy")
     utils.plot_loss(val_history["accuracy"], "Validation Accuracy")
     plt.xlabel("Number of Training Steps")
