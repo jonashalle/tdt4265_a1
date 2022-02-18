@@ -94,13 +94,12 @@ class SoftmaxModel:
         
         layer_sums.append(np.dot(X,self.ws[0]))
         layer_outputs.append(sigmoid(layer_sums[0]))
-
-        if len(self.neurons_per_layer) > 2:
-            for l in range(len(self.neurons_per_layer)-1):
-                layer_sums.append(np.dot(layer_outputs[l-1],self.ws[l]))
-                layer_outputs.append(sigmoid(layer_outputs[l]))
         
-        layer_sums.append(np.dot(layer_outputs[-1],self.ws[-1]))
+        for l in range(len(self.neurons_per_layer)-1):
+            layer_sums.append(np.dot(layer_outputs[l],self.ws[l+1]))
+            layer_outputs.append(sigmoid(layer_sums[l+1]))
+        
+        layer_outputs.pop(-1)
         layer_outputs.append(softmax(layer_sums[-1]))
         
         self.layer_sums = layer_sums
@@ -148,9 +147,9 @@ class SoftmaxModel:
 
         delta_output = diff_cross_entropy(targets, outputs)  # delta_2 = grad C/a * f'(z2)
         delta.append(delta_output)
-        print(f"weights[1]shape : {weights[1].shape}")
-        print(f"sums[0]shape : {sums[0].shape}")
-        print(f"delta[0]shape : {delta[1].shape}")
+        #print(f"weights[1]shape : {weights[1].shape}")
+        #print(f"sums[0]shape : {sums[0].shape}")
+        #print(f"delta[0]shape : {delta[1].shape}")
 
         for l in range(len(self.neurons_per_layer)):
             delta.append(weights[l].dot(delta[l].T).T * diff_sigmoid(sums[l-1]).T)  # delta_1 = weight_2^T delta_2 * f'(z1)
@@ -159,6 +158,9 @@ class SoftmaxModel:
 
         self.grads.insert(0, delta[0].dot(X).T/X.shape[0]) # Grad C with regards to w_ji
         
+        weights = self.ws[::-1]
+        z = self.layer
+
 
         for grad, w in zip(self.grads, self.ws):
             assert grad.shape == w.shape,\
@@ -228,7 +230,7 @@ if __name__ == "__main__":
     assert X_train.shape[1] == 785,\
         f"Expected X_train to have 785 elements per image. Shape was: {X_train.shape}"
 
-    neurons_per_layer = [64, 10]
+    neurons_per_layer = [64, 10, 10]
     use_improved_sigmoid = False
     use_improved_weight_init = False
     model = SoftmaxModel(
