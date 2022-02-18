@@ -89,23 +89,38 @@ class SoftmaxModel:
             y: output of model with shape [batch size, num_outputs]
         """
         # TODO implement this function (Task 2b)
-        self.layer_outputs = []
-        self.layer_sums = []
+        layer_sums = []
+        layer_outputs = []
         
+        layer_sums.append(np.dot(X,self.ws[0]))
+        layer_outputs.append(sigmoid(layer_sums[0]))
+
+        if len(self.neurons_per_layer) > 2:
+            for l in range(len(self.neurons_per_layer)-1):
+                layer_sums.append(np.dot(layer_outputs[l-1],self.ws[l]))
+                layer_outputs.append(sigmoid(layer_outputs[l]))
+        
+        layer_sums.append(np.dot(layer_outputs[-1],self.ws[-1]))
+        layer_outputs.append(softmax(layer_sums[-1]))
+        
+        self.layer_sums = layer_sums
+        self.layer_outputs = layer_outputs
+
+        """
         z1 = np.dot(X,self.ws[0])
         a1 = sigmoid(z1)
         z2 = np.dot(a1,self.ws[1])
-        a2 = softmax(z2)
+        a2 = softmax(z2)     
 
         self.layer_outputs.append(a1)
         self.layer_outputs.append(a2)
 
         self.layer_sums.append(z1)
         self.layer_sums.append(z2)
-
+        """
         # HINT: For performing the backward pass, you can save intermediate activations in variables in the forward pass.
         # such as self.hidden_layer_output = ...
-        return a2
+        return layer_outputs[-1]
     
     
 
@@ -127,22 +142,23 @@ class SoftmaxModel:
         
         self.grads = []
         delta = []
+        weights = self.ws[::-1]
+        sums = self.layer_sums[::-1]
+        activations = self.layer_outputs[::-1]
 
         delta_output = diff_cross_entropy(targets, outputs)  # delta_2 = grad C/a * f'(z2)
-        # print(f"Shape of ws[1] : {self.ws[1].shape}")
-        # print(f"Shape of d_output : {d_output.shape}")
-        # print(f"Shape of ws[1].dot(d_output.T) : {self.ws[1].dot(d_output.T).shape}")
-        # print(f"Shape of diff_sigmoid(z2) : {diff_sigmoid(self.layer_sums[1]).shape}")
-        delta.append(self.ws[1].dot(delta_output.T) * diff_sigmoid(self.layer_sums[0]).T)  # delta_1 = weight_2^T delta_2 * f'(z1) 
-        # delta[0] =  diff_cross_entropy(targets, outputs).T.dot(delta[1]) * np.dot(self.ws[1].T, delta[1]) #     
         delta.append(delta_output)
-        # print(f"Shape of delta[1] : {delta[1].shape}")
-        # print(f"Shape of weights[0] : {self.ws[0].shape}")
-        # print(f"Shape of X : {X.shape}")
-        self.grads.append(delta[0].dot(X).T/X.shape[0]) # Grad C with regards to w_ji
-        self.grads.append(delta[1].T.dot(self.layer_outputs[0]).T/X.shape[0])   # Grad C with regards to w_kj
-        # print(f"Shape of diff_cross_entropy : {diff_cross_entropy(targets, outputs).shape}")
-        # print(f"Shape of grads[1] : {self.grads[1].shape}")
+        print(f"weights[1]shape : {weights[1].shape}")
+        print(f"sums[0]shape : {sums[0].shape}")
+        print(f"delta[0]shape : {delta[1].shape}")
+
+        for l in range(len(self.neurons_per_layer)):
+            delta.append(weights[l].dot(delta[l].T).T * diff_sigmoid(sums[l-1]).T)  # delta_1 = weight_2^T delta_2 * f'(z1)
+            grad = delta[l].T.dot(activations[l]).T/X.shape[0]
+            self.grad.insert(0, grad)
+
+        self.grads.insert(0, delta[0].dot(X).T/X.shape[0]) # Grad C with regards to w_ji
+        
 
         for grad, w in zip(self.grads, self.ws):
             assert grad.shape == w.shape,\
