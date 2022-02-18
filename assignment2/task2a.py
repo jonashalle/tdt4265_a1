@@ -140,27 +140,19 @@ class SoftmaxModel:
         # For example, self.grads[0] will be the gradient for the first hidden layer
         
         self.grads = []
-        delta = []
         weights = self.ws[::-1]
-        sums = self.layer_sums[::-1]
-        activations = self.layer_outputs[::-1]
+        z = self.layer_sums[::-1]
+        a = self.layer_outputs[::-1]
+        z.pop(0)
+        a.pop(0)
 
-        delta_output = diff_cross_entropy(targets, outputs)  # delta_2 = grad C/a * f'(z2)
-        delta.append(delta_output)
-        #print(f"weights[1]shape : {weights[1].shape}")
-        #print(f"sums[0]shape : {sums[0].shape}")
-        #print(f"delta[0]shape : {delta[1].shape}")
+        delta = diff_cross_entropy(targets, outputs)
 
-        for l in range(len(self.neurons_per_layer)):
-            delta.append(weights[l].dot(delta[l].T).T * diff_sigmoid(sums[l-1]).T)  # delta_1 = weight_2^T delta_2 * f'(z1)
-            grad = delta[l].T.dot(activations[l]).T/X.shape[0]
-            self.grad.insert(0, grad)
+        for l in range(len(self.neurons_per_layer)-1):
+            self.grads.insert(0, delta.T.dot(a[l]).T/X.shape[0])
+            delta = delta.dot(weights[l].T) * diff_sigmoid(z[l])
 
-        self.grads.insert(0, delta[0].dot(X).T/X.shape[0]) # Grad C with regards to w_ji
-        
-        weights = self.ws[::-1]
-        z = self.layer
-
+        self.grads.insert(0, delta.T.dot(X).T/X.shape[0])
 
         for grad, w in zip(self.grads, self.ws):
             assert grad.shape == w.shape,\
