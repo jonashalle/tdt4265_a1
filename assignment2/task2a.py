@@ -40,12 +40,24 @@ def cross_entropy_loss(targets: np.ndarray, outputs: np.ndarray):
 
 def improved_sigmoid(z):
     return 1.7159*np.tanh(2/3*z)
+def sigmoid(x: np.ndarray) -> np.ndarray:
+        """ modified hyperbolic tangent function """
+        CNT = 1.7159
+        DIV = np.divide(2.0, 3.0)
+        return np.multiply(CNT, np.tanh(np.multiply(DIV,x)))
+    
+def diff_sigmoid(x: np.ndarray) -> np.ndarray:
+    CNT = 1.7159 # scale factor
+    DIV = np.divide(2.0, 3.0) # scale factor
+    SCALER = np.multiply(CNT, DIV) # scale factor
+    return SCALER * np.divide(1, np.power(np.cosh(np.multiply(DIV, x)), 2))
+# def sigmoid(z):
+#     return 1/(1+np.exp(-z))
 
-def sigmoid(z):
-    return 1/(1+np.exp(-z))
+# def diff_sigmoid(z):
+#     return sigmoid(z)*(1-sigmoid(z)) # Derivative of the sigmoid function
 
-def diff_sigmoid(z):
-    return sigmoid(z)*(1-sigmoid(z)) # Derivative of the sigmoid function
+
 
 def softmax(z):
     return np.exp(z)/np.sum(np.exp(z), axis = 1, keepdims=True)
