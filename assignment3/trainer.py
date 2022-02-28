@@ -4,7 +4,7 @@ import time
 import collections
 import utils
 import pathlib
-
+import numpy as np
 
 def compute_loss_and_accuracy(
         dataloader: torch.utils.data.DataLoader,
@@ -22,18 +22,38 @@ def compute_loss_and_accuracy(
     """
     average_loss = 0
     accuracy = 0
+    count = 0
+    current_accuracy = 0
+    loss = 0
     # TODO: Implement this function (Task  2a)
     with torch.no_grad():
         for (X_batch, Y_batch) in dataloader:
+            count += 1
+            Y = Y_batch
             # Transfer images/labels to GPU VRAM, if possible
             X_batch = utils.to_cuda(X_batch)
             Y_batch = utils.to_cuda(Y_batch)
             # Forward pass the images through our model
             output_probs = model(X_batch)
-
+            
             # Compute Loss and Accuracy
+            loss += loss_criterion(output_probs, Y_batch)
+            
+            
+            # for loop solution for accuracy using NumPy 
+            #print(f"Y_batch.shape : {Y_batch.shape}")
+            #for idx, val in enumerate(output_probs):
+                #target = Y_batch[idx]
+                #if np.argmax(target) == np.argmax(val):
+                 #   current_accuracy += 1
 
-    return average_loss, accuracy
+            # non loop solution using PyTorch
+            prediction = torch.max(output_probs, 1)
+            current_accuracy += (prediction == Y_batch).sum().float()/(Y_batch.shape[0])
+            
+        average_loss = loss/count
+        accuracy = accuracy/count
+        return average_loss, accuracy
 
 
 class Trainer:
