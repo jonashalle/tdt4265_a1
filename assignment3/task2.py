@@ -93,10 +93,13 @@ def create_plots(trainer: Trainer, name: str):
     plt.title("Cross Entropy Loss")
     utils.plot_loss(trainer.train_history["loss"], label="Training loss", npoints_to_average=10)
     utils.plot_loss(trainer.validation_history["loss"], label="Validation loss")
+    utils.plot_loss(trainer.test_history["loss"], label="Test loss")
     plt.legend()
     plt.subplot(1, 2, 2)
     plt.title("Accuracy")
     utils.plot_loss(trainer.validation_history["accuracy"], label="Validation Accuracy")
+    utils.plot_loss(trainer.train_history["accuracy"], label="Training Accuracy")
+    utils.plot_loss(trainer.test_history["accuracy"], label="Test Accuracy")
     plt.legend()
     plt.savefig(plot_path.joinpath(f"{name}_plot.png"))
     plt.show()
@@ -121,7 +124,7 @@ def main():
         dataloaders
     )
     trainer.train()
-    create_plots(trainer, "task2")
+    create_plots(trainer, "task2b")
 
 if __name__ == "__main__":
     main()

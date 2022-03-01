@@ -38,21 +38,11 @@ def compute_loss_and_accuracy(
             
             # Compute Loss and Accuracy
             loss += loss_criterion(output_probs, Y_batch)
-            
-            
-            # for loop solution for accuracy using NumPy 
-            #print(f"Y_batch.shape : {Y_batch.shape}")
-            #for idx, val in enumerate(output_probs):
-                #target = Y_batch[idx]
-                #if np.argmax(target) == np.argmax(val):
-                 #   current_accuracy += 1
-
-            # non loop solution using PyTorch
-            prediction = torch.max(output_probs, 1)
+            _, prediction = torch.max(output_probs.data, 1)
             current_accuracy += (prediction == Y_batch).sum().float()/(Y_batch.shape[0])
             
         average_loss = loss/count
-        accuracy = accuracy/count
+        accuracy = current_accuracy/count
         return average_loss, accuracy
 
 
@@ -103,6 +93,13 @@ class Trainer:
             loss=collections.OrderedDict(),
             accuracy=collections.OrderedDict()
         )
+
+        # Self made test tracking
+        self.test_history = dict(
+            loss=collections.OrderedDict(),
+            accuracy=collections.OrderedDict()
+        )
+
         self.checkpoint_dir = pathlib.Path("checkpoints")
 
     def validation_step(self):
@@ -116,14 +113,28 @@ class Trainer:
         )
         self.validation_history["loss"][self.global_step] = validation_loss
         self.validation_history["accuracy"][self.global_step] = validation_acc
+
+        test_loss, test_acc = compute_loss_and_accuracy(
+            self.dataloader_test, self.model, self.loss_criterion
+        )
+        self.test_history["loss"][self.global_step] = test_loss
+        self.test_history["accuracy"][self.global_step] = test_acc
+
         used_time = time.time() - self.start_time
         print(
             f"Epoch: {self.epoch:>1}",
             f"Batches per seconds: {self.global_step / used_time:.2f}",
             f"Global step: {self.global_step:>6}",
+            #f"Training Loss: {train_loss:.2f}",
+            #f"Training Accuracy: {train_acc:.3f}",
             f"Validation Loss: {validation_loss:.2f}",
             f"Validation Accuracy: {validation_acc:.3f}",
+            f"Test Loss: {test_loss:.2f}",
+            f"Test Accuracy: {test_acc:.3f}",
             sep=", ")
+
+
+        used_time = time.time() - self.start_time
         self.model.train()
 
     def should_early_stop(self):
@@ -216,3 +227,17 @@ class Trainer:
                 f"Could not load best checkpoint. Did not find under: {self.checkpoint_dir}")
             return
         self.model.load_state_dict(state_dict)
+
+    def test_model(self):
+        self.load_best_model()
+        test_loss, test_acc = compute_loss_and_accuracy(
+            self.dataloader_test, self.model, self.loss_criterion
+        )
+        self.test_history["loss"][self.global_step] = test_loss
+        self.test_history["accuracy"][self.global_step] = test_acc
+        used_time = time.time() - self.start_time
+        print(
+            f"Test Loss: {test_loss:.2f}",
+            f"Test Accuracy: {test_acc:.3f}",
+            sep=", ")
+        self.model.train()
