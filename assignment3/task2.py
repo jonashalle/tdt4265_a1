@@ -63,7 +63,8 @@ class ExampleModel(nn.Module):
         self.classifier = nn.Sequential(
             nn.Linear(self.num_output_features, 64),
             nn.ReLU(),
-            nn.Linear(64, num_classes)
+            nn.Linear(64, num_classes),
+            nn.LogSoftmax(1)    # Not quite certain why LogSoftmax works well, but Softmax doesn't
         )
         
 
