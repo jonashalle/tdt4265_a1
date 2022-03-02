@@ -18,7 +18,7 @@ class Model1(nn.Module):
         """
         super().__init__()
         # TODO: Implement this function (Task  2a)
-        num_filters = 64  # Set number of filters in first conv layer
+        num_filters = 32  # Set number of filters in first conv layer
         self.num_classes = num_classes
         pool_kernel_size = [2,2]
         pool_stride = 2
@@ -32,10 +32,26 @@ class Model1(nn.Module):
                 padding=2
             ),
             nn.ReLU(),
+            nn.BatchNorm2d(
+                num_features=num_filters
+            ),
+            nn.MaxPool2d(pool_kernel_size, stride = pool_stride),
+            nn.Conv2d(
+                in_channels=num_filters,
+                out_channels=num_filters*2,
+                kernel_size=5,
+                stride=1,
+                padding=2
+            ),
+            nn.ReLU(),
+            nn.BatchNorm2d(
+                num_features=64
+            ),
             nn.MaxPool2d(pool_kernel_size, stride = pool_stride)
+
         )
         # The output of feature_extractor will be [batch_size, num_filters, 16, 16]
-        self.num_output_features = num_filters*16*16
+        self.num_output_features = 64*8*8
         # Initialize our last fully connected layer
         # Inputs all extracted features from the convolutional layers
         # Outputs num_classes predictions, 1 for each class.
@@ -43,9 +59,12 @@ class Model1(nn.Module):
         # included with nn.CrossEntropyLoss
         self.classifier = nn.Sequential(
             nn.Linear(self.num_output_features, 64),
+            nn.BatchNorm1d(
+                num_features=64
+            ),
             nn.ReLU(),
             nn.Linear(64, num_classes),
-            nn.LogSoftmax(1)
+            nn.LogSoftmax(1),
         )
         
 
