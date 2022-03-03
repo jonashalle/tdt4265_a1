@@ -32,7 +32,7 @@ class Model2(nn.Module):
                 padding=2
             ),
             nn.ReLU(),
-            nn.MaxPool2d(pool_kernel_size, stride = pool_stride),
+            nn.BatchNorm2d(num_features=num_filters),
             nn.Conv2d(
                 in_channels=num_filters,
                 out_channels=64,
@@ -41,6 +41,7 @@ class Model2(nn.Module):
                 padding=2   
             ),
             nn.ReLU(),
+            nn.BatchNorm2d(num_features=64),
             nn.MaxPool2d(pool_kernel_size, stride = pool_stride),
             nn.Conv2d(
                 in_channels=64,
@@ -50,10 +51,28 @@ class Model2(nn.Module):
                 padding=2   
             ),
             nn.ReLU(),
-            nn.MaxPool2d(pool_kernel_size, stride = pool_stride)
+            nn.BatchNorm2d(num_features=128),
+            nn.Conv2d(
+                in_channels=128,
+                out_channels=256,
+                kernel_size=5,
+                stride=1,
+                padding=2
+            ),
+            nn.ReLU(),
+            #nn.BatchNorm2d(num_features=256),
+            nn.MaxPool2d(pool_kernel_size, stride = pool_stride),
+            nn.Conv2d(
+                in_channels=256,
+                out_channels=512,
+                kernel_size=5,
+                stride=1,
+                padding=2   
+            ),
+            nn.ReLU(),
         )
         # The output of feature_extractor will be [batch_size, num_filters, 16, 16]
-        self.num_output_features = 128*4*4
+        self.num_output_features = 512*8*8
         # Initialize our last fully connected layer
         # Inputs all extracted features from the convolutional layers
         # Outputs num_classes predictions, 1 for each class.
@@ -61,6 +80,7 @@ class Model2(nn.Module):
         # included with nn.CrossEntropyLoss
         self.classifier = nn.Sequential(
             nn.Linear(self.num_output_features, 64),
+            nn.BatchNorm1d(64),
             nn.ReLU(),
             nn.Linear(64, num_classes)
         )

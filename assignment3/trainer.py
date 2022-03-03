@@ -72,7 +72,7 @@ class Trainer:
         print(self.model)
 
         # Define our optimizer. SGD = Stochastic Gradient Descent
-        self.optimizer = torch.optim.SGD(self.model.parameters(), self.learning_rate, momentum = 0.9)
+        self.optimizer = torch.optim.SGD(self.model.parameters(), self.learning_rate, momentum = 0.5)
         # self.optimizer = torch.optim.Adam(self.model.parameters())
         # self.optimizer = torch.optim.RMSprop(self.model.parameters())
         # Load our dataset

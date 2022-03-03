@@ -18,7 +18,7 @@ class Model1(nn.Module):
         """
         super().__init__()
         # TODO: Implement this function (Task  2a)
-        num_filters = 32  # Set number of filters in first conv layer
+        num_filters = 32*2  # Set number of filters in first conv layer
         self.num_classes = num_classes
         pool_kernel_size = [2,2]
         pool_stride = 2
@@ -35,7 +35,7 @@ class Model1(nn.Module):
             nn.BatchNorm2d(
                 num_features=num_filters
             ),
-            nn.MaxPool2d(pool_kernel_size, stride = pool_stride),
+            nn.MaxPool2d(pool_kernel_size, stride = pool_stride, padding=0),
             nn.Conv2d(
                 in_channels=num_filters,
                 out_channels=num_filters*2,
@@ -45,13 +45,13 @@ class Model1(nn.Module):
             ),
             nn.ReLU(),
             nn.BatchNorm2d(
-                num_features=64
+                num_features=num_filters*2
             ),
-            nn.MaxPool2d(pool_kernel_size, stride = pool_stride)
+            nn.MaxPool2d(pool_kernel_size, stride = pool_stride, padding=0)
 
         )
         # The output of feature_extractor will be [batch_size, num_filters, 16, 16]
-        self.num_output_features = 64*8*8
+        self.num_output_features = 128*8*8
         # Initialize our last fully connected layer
         # Inputs all extracted features from the convolutional layers
         # Outputs num_classes predictions, 1 for each class.
