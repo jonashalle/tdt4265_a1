@@ -33,30 +33,31 @@ def main():
     utils.set_seed(0)
     epochs = 10
     batch_size = 64
-    learning_rate = 5e-2/10
-    early_stop_count = 4
+    learning_rate = 5e-2*2
+    early_stop_count = 6
     dataloaders = load_cifar10(batch_size)
-    model1 = Model1(image_channels=3, num_classes=10)
-    trainer1 = Trainer(
-        batch_size,
-        learning_rate,
-        early_stop_count,
-        epochs,
-        model1,
-        dataloaders
-    )
-    trainer1.train()
-    # model2 = Model2(image_channels=3, num_classes=10)
-    # trainer2 = Trainer(
+    # model1 = Model1(image_channels=3, num_classes=10)
+    # trainer1 = Trainer(
     #     batch_size,
     #     learning_rate,
     #     early_stop_count,
     #     epochs,
-    #     model2,
+    #     model1,
     #     dataloaders
     # )
-    # trainer2.train()
-    create_plots(trainer1, "task3_model1: ")
+    # trainer1.train()
+    model2 = Model2(image_channels=3, num_classes=10)
+    trainer2 = Trainer(
+        batch_size,
+        learning_rate,
+        early_stop_count,
+        epochs,
+        model2,
+        dataloaders
+    )
+    trainer2.train()
+    #create_plots(trainer1, "task3_model1: ")
+    create_plots(trainer2, "Task3_model2_plot")
 
 if __name__ == "__main__":
     main()
