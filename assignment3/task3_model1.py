@@ -18,7 +18,7 @@ class Model1(nn.Module):
         """
         super().__init__()
         # TODO: Implement this function (Task  2a)
-        num_filters = 32*2  # Set number of filters in first conv layer
+        num_filters = 32*2*2  # Set number of filters in first conv layer
         self.num_classes = num_classes
         pool_kernel_size = [2,2]
         pool_stride = 2
@@ -51,7 +51,7 @@ class Model1(nn.Module):
 
         )
         # The output of feature_extractor will be [batch_size, num_filters, 16, 16]
-        self.num_output_features = 128*8*8
+        self.num_output_features = 128*8*8*2
         # Initialize our last fully connected layer
         # Inputs all extracted features from the convolutional layers
         # Outputs num_classes predictions, 1 for each class.
@@ -64,7 +64,7 @@ class Model1(nn.Module):
             ),
             nn.ReLU(),
             nn.Linear(64, num_classes),
-            nn.LogSoftmax(1),
+            #nn.LogSoftmax(1),
         )
         
 

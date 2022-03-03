@@ -18,7 +18,7 @@ class Model2(nn.Module):
         """
         super().__init__()
         # TODO: Implement this function (Task  2a)
-        num_filters = 32  # Set number of filters in first conv layer
+        num_filters = 16  # Set number of filters in first conv layer
         self.num_classes = num_classes
         pool_kernel_size = [2,2]
         pool_stride = 2
@@ -35,26 +35,26 @@ class Model2(nn.Module):
             nn.BatchNorm2d(num_features=num_filters),
             nn.Conv2d(
                 in_channels=num_filters,
-                out_channels=64,
+                out_channels=num_filters*2,
                 kernel_size=5,
                 stride=1,
                 padding=2   
             ),
             nn.ReLU(),
-            nn.BatchNorm2d(num_features=64),
+            nn.BatchNorm2d(num_features=num_filters*2),
             nn.MaxPool2d(pool_kernel_size, stride = pool_stride),
             nn.Conv2d(
-                in_channels=64,
-                out_channels=128,
+                in_channels=num_filters*2,
+                out_channels=num_filters*4,
                 kernel_size=5,
                 stride=1,
                 padding=2   
             ),
             nn.ReLU(),
-            nn.BatchNorm2d(num_features=128),
+            nn.BatchNorm2d(num_features=num_filters*4),
             nn.Conv2d(
-                in_channels=128,
-                out_channels=256,
+                in_channels=num_filters*4,
+                out_channels=num_filters*8,
                 kernel_size=5,
                 stride=1,
                 padding=2
@@ -63,16 +63,17 @@ class Model2(nn.Module):
             #nn.BatchNorm2d(num_features=256),
             nn.MaxPool2d(pool_kernel_size, stride = pool_stride),
             nn.Conv2d(
-                in_channels=256,
-                out_channels=512,
-                kernel_size=5,
+                in_channels=num_filters*8,
+                out_channels=num_filters*16,
+                kernel_size=3,
                 stride=1,
-                padding=2   
+                padding=1   
             ),
             nn.ReLU(),
+            
         )
         # The output of feature_extractor will be [batch_size, num_filters, 16, 16]
-        self.num_output_features = 512*8*8
+        self.num_output_features = num_filters*16*8*8
         # Initialize our last fully connected layer
         # Inputs all extracted features from the convolutional layers
         # Outputs num_classes predictions, 1 for each class.
