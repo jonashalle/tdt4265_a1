@@ -70,8 +70,8 @@ def main():
     #     dataloaders
     # )
     # trainer1.train()
-    #model2 = Model2(image_channels=3, num_classes=10)
-    model2 = Model4()
+    model2 = Model2(image_channels=3, num_classes=10)
+    #model2 = Model4()
     trainer2 = Trainer(
         batch_size,
         learning_rate,
