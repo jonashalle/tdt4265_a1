@@ -56,8 +56,8 @@ def main():
     # You can try to change this and check if you still get the same result! 
     utils.set_seed(0)
     epochs = 10
-    batch_size = 64
-    learning_rate = 5e-2*2
+    batch_size = 32
+    learning_rate = 5e-4
     early_stop_count = 4
     dataloaders = load_cifar10(batch_size)
     # model1 = Model1(image_channels=3, num_classes=10)
@@ -70,7 +70,8 @@ def main():
     #     dataloaders
     # )
     # trainer1.train()
-    model2 = Model4(image_channels=3, num_classes=10)
+    #model2 = Model2(image_channels=3, num_classes=10)
+    model2 = Model4()
     trainer2 = Trainer(
         batch_size,
         learning_rate,

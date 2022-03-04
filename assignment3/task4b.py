@@ -23,7 +23,7 @@ print("Image shape:", image.shape)
 
 activation = first_conv_layer(image)
 print("Activation shape:", activation.shape)
-
+weight = model.conv1.weight.data
 
 def torch_image_to_numpy(image: torch.Tensor):
     """
@@ -46,3 +46,14 @@ def torch_image_to_numpy(image: torch.Tensor):
 
 
 indices = [14, 26, 32, 49, 52]
+
+for i, idx in enumerate(indices):
+    plt.subplot(2, 5, i + 1)
+    img_kernel = torch_image_to_numpy(first_conv_layer.weight[idx, ...])
+    plt.imshow(img_kernel)
+    plt.subplot(2, 5, i + 6)
+    img_activation = torch_image_to_numpy(activation[0, idx, :, :])
+    plt.imshow(img_activation, cmap = "gray")
+
+plt.show()
+plt.savefig('Task4b.png', format ="png")
