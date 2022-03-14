@@ -18,9 +18,16 @@ def calculate_iou(prediction_box, gt_box):
     # YOUR CODE HERE
 
     # Compute intersection
-
+    xmin = max(prediction_box[0], gt_box[0])
+    xmax = min(prediction_box[2], gt_box[2])
+    ymin = max(prediction_box[1], gt_box[1])
+    ymax = min(prediction_box[3], gt_box[3])
+    intersection_area = max(0,xmax - xmin)*max(0,ymax-ymin)
+    prediction_area = (prediction_box[2]- prediction_box[0])*(prediction_box[3] - prediction_box[1])
+    gt_area = (gt_box[2]- gt_box[0])*(gt_box[3] - gt_box[1])
     # Compute union
-    iou = 0
+    iou = intersection_area/float(prediction_area+gt_area-intersection_area)
+    print('iou___________________: ', iou)
     assert iou >= 0 and iou <= 1
     return iou
 
@@ -241,3 +248,6 @@ if __name__ == "__main__":
     ground_truth_boxes = read_ground_truth_boxes()
     predicted_boxes = read_predicted_boxes()
     mean_average_precision(ground_truth_boxes, predicted_boxes)
+    boxA = predicted_boxes
+    boxB = ground_truth_boxes
+    
