@@ -175,7 +175,18 @@ def calculate_precision_recall_all_images(
     Returns:
         tuple: (precision, recall). Both float.
     """
-    raise NotImplementedError
+    for prediction_boxes in range (len(all_prediction_boxes))
+        individual_img_res = calculate_individual_image_result(all_prediction_boxes[prediction_boxes],
+    	                                            all_gt_boxes[prediction_boxes], 
+    	                                            iou_threshold)
+        sum_tp += individual_img_res["true_pos"]
+        sum_fp += individual_img_res["false_pos"]
+        sum_fn += individual_img_res["false_neg"]
+
+    precision = calculate_precision(sum_tp, sum_fp, sum_fn)
+    recall = calculate_recall(sum_tp, sum_fp, sum_fn)
+
+    return precision, recall
 
 
 def get_precision_recall_curve(
