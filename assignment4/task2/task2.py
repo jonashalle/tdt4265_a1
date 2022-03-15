@@ -86,16 +86,48 @@ def get_all_box_matches(prediction_boxes, gt_boxes, iou_threshold):
             objects with shape: [number of box matches, 4].
             Each row includes [xmin, ymin, xmax, ymax]
     """
+    
     # Find all possible matches with a IoU >= iou threshold
-
-
+    pred_returns = []
+    gt_returns = []
+    all_array = []
+    for pred_idx in range(0, len(prediction_boxes)):
+        pred_box = prediction_boxes[pred_idx,:]
+        for gt_idx in range(0, len(gt_boxes)):
+            gt_box = gt_boxes[gt_idx,:]
+            iou = calculate_iou(pred_box,gt_box)
+            
+            if iou >= iou_threshold:
+                array = [pred_idx, gt_idx, iou]
+                all_array.append(array)
+              
     # Sort all matches on IoU in descending order
-
+    data = np.asarray(all_array)
+    if data.ndim > 1:
+        sorted_data = data[data[:,2].argsort()]
+        sorted_data = sorted_data[::-1]
+    else:
+        sorted_data = data
+    used_idx_pred = []
+    used_idx_gt = []
     # Find all matches with the highest IoU threshold
+    for i in range(len(sorted_data)):
+        box_with_iou = sorted_data[i,:]
+        
+        if box_with_iou[0] not in used_idx_pred and box_with_iou[1] not in used_idx_gt:
+            used_idx_pred.append(box_with_iou[0])
+            used_idx_gt.append(box_with_iou[1])
+            pred_returns.append(prediction_boxes[int(box_with_iou[0]),:])
+            gt_returns.append(gt_boxes[int(box_with_iou[1]),:])
+
+
+    prediction_boxes = np.asarray(pred_returns)
+    gt_boxes = np.asarray(gt_returns)
 
 
 
-    return np.array([]), np.array([])
+
+    return prediction_boxes, gt_boxes
 
 
 def calculate_individual_image_result(prediction_boxes, gt_boxes, iou_threshold):
@@ -113,10 +145,15 @@ def calculate_individual_image_result(prediction_boxes, gt_boxes, iou_threshold)
             Each row includes [xmin, ymin, xmax, ymax]
     Returns:
         dict: containing true positives, false positives, true negatives, false negatives
-            {"true_pos": int, "false_pos": int, false_neg": int}
+            {"true_pos": int, "false_pos": int, "false_neg": int}
     """
+    prediction_matches, gt_matches = get_all_box_matches(prediction_boxes, gt_boxes, iou_threshold)
+    
+    tp = len(prediction_matches)
+    fp = len(prediction_boxes) - tp
+    fn = len(gt_boxes) - tp
 
-    raise NotImplementedError
+    return {"true_pos": tp, "false_pos":fp, "false_neg": fn}
 
 
 def calculate_precision_recall_all_images(
