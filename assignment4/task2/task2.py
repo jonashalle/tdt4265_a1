@@ -175,7 +175,10 @@ def calculate_precision_recall_all_images(
     Returns:
         tuple: (precision, recall). Both float.
     """
-    for prediction_boxes in range (len(all_prediction_boxes))
+    sum_tp = 0
+    sum_fp = 0
+    sum_fn = 0
+    for prediction_boxes in range(len(all_prediction_boxes)):
         individual_img_res = calculate_individual_image_result(all_prediction_boxes[prediction_boxes],
     	                                            all_gt_boxes[prediction_boxes], 
     	                                            iou_threshold)
@@ -222,6 +225,22 @@ def get_precision_recall_curve(
 
     precisions = [] 
     recalls = []
+
+    for confidence_threshold in confidence_thresholds:
+        conf_preds = []
+        for i, confidence_score in enumerate(confidence_scores):
+            im_preds = []
+            for j in range(len(confidence_score)):
+                if confidence_score[j] > confidence_threshold:
+                    im_preds.append(all_prediction_boxes[i][j])
+
+            conf_preds.append(np.array(im_preds))
+
+        precision, recall = calculate_precision_recall_all_images(conf_preds, all_gt_boxes, iou_threshold)
+
+        precisions.append(precision)
+        recalls.append(recall)
+            
     return np.array(precisions), np.array(recalls)
 
 
@@ -258,8 +277,22 @@ def calculate_mean_average_precision(precisions, recalls):
     # Calculate the mean average precision given these recall levels.
     recall_levels = np.linspace(0, 1.0, 11)
     # YOUR CODE HERE
+    
     average_precision = 0
-    return average_precision
+    count = 0
+
+    for recall_level in recall_levels:
+        max_precision = 0
+        for precision, recall in zip(precisions, recalls):
+            if recall >= recall_level and precision > max_precision:
+                max_precision = precision
+
+        count += 1
+        average_precision += max_precision    
+    
+
+    mAP = average_precision/count
+    return mAP
 
 
 def mean_average_precision(ground_truth_boxes, predicted_boxes):

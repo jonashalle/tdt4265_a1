@@ -1,4 +1,4 @@
-from task2 import *
+from task2 import * 
 import numpy as np
 
 
@@ -187,7 +187,6 @@ def test_get_precision_recall_curve():
     res2 = int(res2.sum())
     assert res1 == ans1, "Expected {}, got: {}".format(ans1, res1)
     assert res2 == ans2, "Expected {}, got: {}".format(ans2, res2)
-
 
 def test_mean_average_precision():
     print("="*80)
