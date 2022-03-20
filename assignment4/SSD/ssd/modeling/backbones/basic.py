@@ -1,6 +1,27 @@
 import torch.nn as nn
 from typing import Tuple, List
 
+
+def relu_conv_layer(in_channel_size,out_channel_size,num_filters,conv_kernel_size,conv_padding):
+    return nn.Sequential(
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=in_channel_size,
+                out_channels=num_filters,
+                kernel_size = conv_kernel_size,
+                stride = 1,
+                padding = conv_padding
+            ),
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=num_filters,
+                out_channels=out_channel_size,
+                kernel_size = conv_kernel_size,
+                stride = 2,
+                padding = conv_padding
+            ),
+            nn.ReLU()
+        )
 class BasicModel(nn.Module):
     """
     This is a basic backbone for SSD.
@@ -19,156 +40,100 @@ class BasicModel(nn.Module):
         super().__init__()
         self.out_channels = output_channels
         self.output_feature_shape = output_feature_sizes
-        conv_kernel_size = 3
-        conv_padding = 1
-        pool_kernel_size = 2
-        pool_stride = 2
+        self.conv_kernel_size = 3
+        self.conv_padding = 1
+        self.pool_kernel_size = 2
+        self.pool_stride = 2
 
+
+        
         # output_channels[0]
-        self.out_channels.append(nn.Sequential(
+        self.feature_extractor = [nn.Sequential(
             nn.Conv2d(
                 in_channels = image_channels,
                 out_channels = 32,
-                kernel_size = conv_kernel_size,
+                kernel_size = self.conv_kernel_size,
                 stride = 1,
-                padding = conv_padding
+                padding = self.conv_padding
             ),
             nn.ReLU(),
-            nn.MaxPool2d(pool_kernel_size, stride = pool_stride),
+            nn.MaxPool2d(self.pool_kernel_size, stride = self.pool_stride),
             nn.Conv2d(
                 in_channels = 32,
                 out_channels = 64,
-                kernel_size = conv_kernel_size,
+                kernel_size = self.conv_kernel_size,
                 stride = 1,
-                padding = conv_padding
+                padding = self.conv_padding
             ),
             nn.ReLU(),
-            nn.MaxPool2d(pool_kernel_size, stride = pool_stride),
+            nn.MaxPool2d(self.pool_kernel_size, stride = self.pool_stride),
             nn.Conv2d(
                 in_channels = 64,
                 out_channels = 64,
-                kernel_size = conv_kernel_size,
+                kernel_size = self.conv_kernel_size,
                 stride = 1,
-                padding = conv_padding
+                padding = self.conv_padding
             ),
             nn.ReLU(),
             nn.Conv2d(
                 in_channels = 64,
-                out_channels = 64,
-                kernel_size = conv_kernel_size,
+                out_channels = output_channels[0],
+                kernel_size = self.conv_kernel_size,
                 stride = 2,
-                padding = conv_padding
+                padding = self.conv_padding
             ),
             nn.ReLU(),
-        ))
-
-        # output_channels[1]
-        self.out_channels.append(nn.Sequential(
+        )]
+        print('length:     ',len(self.feature_extractor))
+        self.feature_extractor.append(relu_conv_layer(output_channels[0], output_channels[1], 128, self.conv_kernel_size, self.conv_padding))
+        print(len(self.feature_extractor))
+        self.feature_extractor.append(relu_conv_layer(output_channels[1],output_channels[2],256,self.conv_kernel_size,self.conv_padding))
+        print(len(self.feature_extractor))
+        self.feature_extractor.append(relu_conv_layer(output_channels[2],output_channels[3],128,self.conv_kernel_size,self.conv_padding))
+        self.feature_extractor.append(relu_conv_layer(output_channels[3],output_channels[4],128,self.conv_kernel_size,self.conv_padding))
+        self.feature_extractor.append(nn.Sequential(
             nn.ReLU(),
             nn.Conv2d(
-                in_channels=image_channels,
+                in_channels=64,
                 out_channels=128,
-                kernel_size = conv_kernel_size,
+                kernel_size = 3,
                 stride = 1,
-                padding = conv_padding
+                padding = 1
             ),
             nn.ReLU(),
             nn.Conv2d(
                 in_channels=128,
-                out_channels=128,
-                kernel_size = conv_kernel_size,
-                stride = 2,
-                padding = conv_padding
-            ),
-            nn.ReLU()
-        ))
-
-        # output_channels[2]
-        self.out_channels.append(nn.Sequential(
-            nn.ReLU(),
-            nn.Conv2d(
-                in_channels=image_channels,
-                out_channels=256,
-                kernel_size = conv_kernel_size,
-                stride = 1,
-                padding = conv_padding
-            ),
-            nn.ReLU(),
-            nn.Conv2d(
-                in_channels=256,
-                out_channels=256,
-                kernel_size = conv_kernel_size,
-                stride = 2,
-                padding = conv_padding
-            ),
-            nn.ReLU()
-        ))
-
-        # output_channels[3]
-        self.out_channels.append(nn.Sequential(
-            nn.ReLU(),
-            nn.Conv2d(
-                in_channels=image_channels,
-                out_channels=128,
-                kernel_size = conv_kernel_size,
-                stride = 1,
-                padding = conv_padding
-            ),
-            nn.ReLU(),
-            nn.Conv2d(
-                in_channels=128,
-                out_channels=128,
-                kernel_size = conv_kernel_size,
-                stride = 2,
-                padding = conv_padding
-            ),
-            nn.ReLU()
-        ))
-
-        # output_channels[4]
-        self.out_channels.append(nn.Sequential(
-            nn.ReLU(),
-            nn.Conv2d(
-                in_channels=image_channels,
-                out_channels=128,
-                kernel_size = conv_kernel_size,
-                stride = 1,
-                padding = conv_padding
-            ),
-            nn.ReLU(),
-            nn.Conv2d(
-                in_channels=128,
-                out_channels=128,
-                kernel_size = conv_kernel_size,
-                stride = 2,
-                padding = conv_padding
-            ),
-            nn.ReLU()
-        ))
-
-        # output_channels[5]
-        self.out_channels.append(nn.Sequential(
-            nn.ReLU(),
-            nn.Conv2d(
-                in_channels=image_channels,
-                out_channels=128,
-                kernel_size = conv_kernel_size,
-                stride = 1,
-                padding = conv_padding
-            ),
-            nn.ReLU(),
-            nn.Conv2d(
-                in_channels=128,
-                out_channels=128,
-                kernel_size = conv_kernel_size,
+                out_channels=64,
+                kernel_size = 3,
                 stride = 1,
                 padding = 0
             ),
             nn.ReLU()
         ))
-            
-        for channel in self.out_channels:
-            self.output_feature_shape.append(channel.shape)
+        
+
+   
+
+        # output_channels[5]
+        # self.out_channels.append(nn.Sequential(
+        #     nn.ReLU(),
+        #     nn.Conv2d(
+        #         in_channels=image_channels,
+        #         out_channels=128,
+        #         kernel_size = conv_kernel_size,
+        #         stride = 1,
+        #         padding = conv_padding
+        #     ),
+        #     nn.ReLU(),
+        #     nn.Conv2d(
+        #         in_channels=128,
+        #         out_channels=128,
+        #         kernel_size = conv_kernel_size,
+        #         stride = 1,
+        #         padding = 0
+        #     ),
+        #     nn.ReLU()
+        # ))
 
     def forward(self, x):
         """
@@ -184,6 +149,13 @@ class BasicModel(nn.Module):
             shape(-1, output_channels[0], 38, 38),
         """
         out_features = []
+        print(self.feature_extractor)
+        for feature in self.feature_extractor:
+            x = feature(x)
+            out_features.append(x)
+        for idx, feature in enumerate(out_features):
+            print(feature.shape[1:])
+        
         for idx, feature in enumerate(out_features):
             out_channel = self.out_channels[idx]
             h, w = self.output_feature_shape[idx]
