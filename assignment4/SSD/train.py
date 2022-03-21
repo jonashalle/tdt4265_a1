@@ -9,6 +9,7 @@ import tqdm
 from pathlib import Path
 from ssd.evaluate import evaluate
 from ssd import utils
+#from ssd.utils import load_config
 from tops.config import instantiate
 from tops import logger, checkpointer
 from torch.optim.lr_scheduler import ChainedScheduler
@@ -100,4 +101,5 @@ def train(config_path: Path, evaluate_only: bool):
 
 
 if __name__ == "__main__":
+    #cfg = load_config("../configs/ssd300.py")
     train()

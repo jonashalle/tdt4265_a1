@@ -48,7 +48,7 @@ class BasicModel(nn.Module):
 
         
         # output_channels[0]
-        self.feature_extractor = [nn.Sequential(
+        self.feature_extractor = nn.ModuleList([nn.Sequential(
             nn.Conv2d(
                 in_channels = image_channels,
                 out_channels = 32,
@@ -83,12 +83,11 @@ class BasicModel(nn.Module):
                 padding = self.conv_padding
             ),
             nn.ReLU(),
-        )]
-        print('length:     ',len(self.feature_extractor))
+        )])
         self.feature_extractor.append(relu_conv_layer(output_channels[0], output_channels[1], 128, self.conv_kernel_size, self.conv_padding))
-        print(len(self.feature_extractor))
+
         self.feature_extractor.append(relu_conv_layer(output_channels[1],output_channels[2],256,self.conv_kernel_size,self.conv_padding))
-        print(len(self.feature_extractor))
+        
         self.feature_extractor.append(relu_conv_layer(output_channels[2],output_channels[3],128,self.conv_kernel_size,self.conv_padding))
         self.feature_extractor.append(relu_conv_layer(output_channels[3],output_channels[4],128,self.conv_kernel_size,self.conv_padding))
         self.feature_extractor.append(nn.Sequential(
@@ -149,12 +148,9 @@ class BasicModel(nn.Module):
             shape(-1, output_channels[0], 38, 38),
         """
         out_features = []
-        print(self.feature_extractor)
         for feature in self.feature_extractor:
             x = feature(x)
             out_features.append(x)
-        for idx, feature in enumerate(out_features):
-            print(feature.shape[1:])
         
         for idx, feature in enumerate(out_features):
             out_channel = self.out_channels[idx]
