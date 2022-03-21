@@ -13,6 +13,7 @@ def relu_conv_layer(in_channel_size,out_channel_size,num_filters,conv_kernel_siz
                 padding = conv_padding
             ),
             nn.ReLU(),
+            nn.BatchNorm2d(num_features=num_filters),
             nn.Conv2d(
                 in_channels=num_filters,
                 out_channels=out_channel_size,
@@ -20,7 +21,17 @@ def relu_conv_layer(in_channel_size,out_channel_size,num_filters,conv_kernel_siz
                 stride = 2,
                 padding = conv_padding
             ),
-            nn.ReLU()
+            nn.ReLU(),
+            nn.BatchNorm2d(num_features=out_channel_size),
+            nn.Conv2d(
+                in_channels=out_channel_size,
+                out_channels=out_channel_size,
+                kernel_size = conv_kernel_size,
+                stride = 1,
+                padding = conv_padding
+            ),
+            nn.ReLU(),
+            nn.BatchNorm2d(num_features=out_channel_size),
         )
 class BasicModel(nn.Module):
     """
@@ -57,6 +68,16 @@ class BasicModel(nn.Module):
                 padding = self.conv_padding
             ),
             nn.ReLU(),
+            nn.BatchNorm2d(num_features=32),
+            nn.Conv2d(
+                in_channels = 32,
+                out_channels = 32,
+                kernel_size = self.conv_kernel_size,
+                stride = 1,
+                padding = self.conv_padding
+            ),
+            nn.ReLU(),
+            nn.BatchNorm2d(num_features=32),
             nn.MaxPool2d(self.pool_kernel_size, stride = self.pool_stride),
             nn.Conv2d(
                 in_channels = 32,
@@ -66,6 +87,7 @@ class BasicModel(nn.Module):
                 padding = self.conv_padding
             ),
             nn.ReLU(),
+            nn.BatchNorm2d(num_features=64),
             nn.MaxPool2d(self.pool_kernel_size, stride = self.pool_stride),
             nn.Conv2d(
                 in_channels = 64,
@@ -75,6 +97,7 @@ class BasicModel(nn.Module):
                 padding = self.conv_padding
             ),
             nn.ReLU(),
+            nn.BatchNorm2d(num_features=64),
             nn.Conv2d(
                 in_channels = 64,
                 out_channels = output_channels[0],
@@ -100,6 +123,16 @@ class BasicModel(nn.Module):
                 padding = 1
             ),
             nn.ReLU(),
+            nn.BatchNorm2d(num_features=128),
+            nn.Conv2d(
+                in_channels=128,
+                out_channels=128,
+                kernel_size = 3,
+                stride = 1,
+                padding = 1
+            ),
+            nn.ReLU(),
+            nn.BatchNorm2d(num_features=128),
             nn.Conv2d(
                 in_channels=128,
                 out_channels=64,
@@ -109,30 +142,6 @@ class BasicModel(nn.Module):
             ),
             nn.ReLU()
         ))
-        
-
-   
-
-        # output_channels[5]
-        # self.out_channels.append(nn.Sequential(
-        #     nn.ReLU(),
-        #     nn.Conv2d(
-        #         in_channels=image_channels,
-        #         out_channels=128,
-        #         kernel_size = conv_kernel_size,
-        #         stride = 1,
-        #         padding = conv_padding
-        #     ),
-        #     nn.ReLU(),
-        #     nn.Conv2d(
-        #         in_channels=128,
-        #         out_channels=128,
-        #         kernel_size = conv_kernel_size,
-        #         stride = 1,
-        #         padding = 0
-        #     ),
-        #     nn.ReLU()
-        # ))
 
     def forward(self, x):
         """
