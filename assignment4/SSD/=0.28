@@ -1,0 +1,4 @@
+Collecting Cython
+  Downloading Cython-0.29.28-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl (1.9 MB)
+Installing collected packages: Cython
+Successfully installed Cython-0.29.28

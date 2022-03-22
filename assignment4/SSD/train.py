@@ -9,6 +9,7 @@ import tqdm
 from pathlib import Path
 from ssd.evaluate import evaluate
 from ssd import utils
+#from ssd.utils import load_config
 from tops.config import instantiate
 from tops import logger, checkpointer
 from torch.optim.lr_scheduler import ChainedScheduler
@@ -50,7 +51,7 @@ def train_epoch(
 
 
 @click.command()
-@click.argument("config_path", type=click.Path(exists=True, dir_okay=False, path_type=Path))
+@click.argument("config_path", type=click.Path(exists=True, dir_okay=False, path_type=str))
 @click.option("--evaluate-only", default=False, is_flag=True, help="Only run evaluation, no training.")
 def train(config_path: Path, evaluate_only: bool):
     logger.logger.DEFAULT_SCALAR_LEVEL = logger.logger.DEBUG
@@ -100,4 +101,5 @@ def train(config_path: Path, evaluate_only: bool):
 
 
 if __name__ == "__main__":
+    #cfg = load_config("../configs/ssd300.py")
     train()
